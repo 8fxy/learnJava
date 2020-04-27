@@ -1,0 +1,106 @@
+public class Game {
+
+	public static void main(String[] args) {
+		int maxRound = 10;
+		int i = 1;
+		Boxer boxer1 = new Boxer();
+		Boxer boxer2 = new Boxer();
+		boxer1.createBoxer(100, 10, 3, 50);
+		boxer2.createBoxer(100, 10, 3, 50);
+		while ((boxer1.health > 0) && (boxer2.health > 0) && (i < maxRound)) {
+			boxer1.movements = boxer1.noobAI();
+			boxer2.movements = boxer2.noobAI();
+			// boxer2.noobAI();
+			boxer1.statusRefresh(boxer2);
+			i++;
+		}
+		System.out.println("GAME OVER!");
+		if (boxer1.health > boxer2.health) {
+			System.out.println("A Wins!");
+		} else {
+			System.out.println("B Wins!");
+		}
+	}
+
+}
+
+class Boxer {
+	public String name;
+	public int health;
+	public int hitpoint;
+	public int armor;
+	public int endurance;
+	public int position;
+	public boolean isAlive = health > 0;
+	// 0:STAY, 1:ATTACK, 2:DEFENSE, 3:MOVE
+	public int movements = 0;
+
+	// public void createBoxer(String name, int health, int hitpoint, int armor, int
+	// endurance) {                                                                                                                                                                                                                                       
+	public void createBoxer(int health, int hitpoint, int armor, int endurance) {
+		this.health = health;
+		this.hitpoint = hitpoint;
+		this.armor = armor;
+		this.endurance = endurance;
+	}
+
+	public int noobAI() {
+		if (this.endurance >= 0) {
+			this.movements = 1;
+		} else {
+			this.movements = 0;
+		}
+		return movements;
+	}
+
+	/*
+	 * public int smartAI() {
+	 * 
+	 * if() { this.movements = ?; } return movements; }
+	 */
+
+	public void statusRefresh(Boxer enemy) {
+		if (this.movements == 0) {
+			System.out.println("A静止！");
+			this.endurance = this.endurance + 20;
+			if (enemy.movements == 0) {
+				enemy.endurance = enemy.endurance + 20;
+			} else if (enemy.movements == 1) {
+				enemy.endurance = enemy.endurance - 20;
+				// 静止击中
+				this.health = this.health - enemy.hitpoint;
+			}
+
+		}
+		if (this.movements == 1) {
+			System.out.println("A攻击！");
+			this.endurance = this.endurance - 20;
+			if (enemy.movements == 0) {
+				enemy.endurance = enemy.endurance + 20;
+				enemy.health = enemy.health - this.hitpoint;
+			} else if (enemy.movements == 1) {
+				enemy.endurance = enemy.endurance - 20;
+				// 相互击中
+				this.health = this.health - enemy.hitpoint;
+				enemy.health = enemy.health - this.hitpoint;
+			}
+		}
+		if (this.movements == 2) {
+			System.out.println("A防御！");
+			// 防御
+			if (enemy.movements == 0) {
+				this.endurance = this.endurance + 10;
+				enemy.endurance = enemy.endurance + 20;
+			} else if (enemy.movements == 1) {
+				enemy.endurance = enemy.endurance - 20;
+				this.endurance = this.endurance - 15;
+				// 格挡
+				this.health = this.health - 1;
+			}
+		}
+		if (endurance < 0)
+			endurance = 0;
+		System.out.println("A HP: " + this.health);
+		System.out.println("B HP: " + enemy.health);
+	}
+}
